@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { handleInput, validateIranianNationalCode } from "./lib/utility";
 import toast from "react-hot-toast";
+import SpinnerSVG from "./assets/svgs/spinnerSvg";
 
 interface UsedScore {
   id: number;
@@ -37,11 +38,19 @@ export default function Home() {
   const [saving, setSaving] = useState<{ [key: string]: boolean }>({});
   const [saveMsg, setSaveMsg] = useState<{ [key: string]: string }>({});
 
+  const clearConsumeScores = () => {
+    const cleared = Object.keys(consumeScores).reduce((acc, key) => {
+      acc[key] = "";
+      return acc;
+    }, {} as { [key: string]: string });
+    setConsumeScores(cleared);
+  };
   const handleFetch = async () => {
     setLoading(true);
     setError("");
     setData([]);
     setSelectedIndex(null);
+    clearConsumeScores();
     if (!validateIranianNationalCode(Number(nationalCode))) {
       setError("کد ملی معتبر نیست");
       setLoading(false);
@@ -105,39 +114,49 @@ export default function Home() {
       toast.error("خطا در عملیات!");
       setSaveMsg((prev) => ({ ...prev, [accountNumber]: "Failed to save" }));
     } finally {
+      clearConsumeScores();
       setSaving((prev) => ({ ...prev, [accountNumber]: false }));
     }
   };
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-10 gap-10 sm:p-20">
-      <div className="flex flex-col gap-4 w-full max-w-xl h-1/6">
-        <label className="font-semibold">Enter National Code:</label>
+    <div className="flex flex-col items-center  justify-items-center min-h-screen p-8  gap-20 sm:p-20">
+      <div className="flex flex-col gap-4  max-w-md h-1/6">
+        <label className="font-semibold">کد ملی :</label>
         <div className="flex gap-2">
           <input
             type="number"
-            className="border rounded px-3 py-2 flex-1 ltr"
+            className="border rounded px-3 py-2 flex-1 ltr w-4/6 placeholder:text-right placeholder:text-xs"
             onInput={(e) => handleInput(e, 10)}
             value={nationalCode}
             onChange={(e) => setNationalCode(e.target.value)}
-            placeholder="National Code"
+            placeholder=" کد ملی صاحب امتیاز را وارد نمایید"
             maxLength={10}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !loading && nationalCode) {
+                handleFetch();
+              }
+            }}
           />
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+            className="bg-blue-600 text-white w-24  py-2 rounded disabled:opacity-50 flex justify-center items-center"
             onClick={handleFetch}
             disabled={loading || !nationalCode}
           >
-            {loading ? "Loading..." : "Fetch"}
+            {loading ? (
+              <SpinnerSVG className="h-4 w-4 animate-spin text-white" />
+            ) : (
+              "جستجو"
+            )}
           </button>
         </div>
-        {error && <div className="text-red-600">{error}</div>}
+        {error && <div className="text-red-600 text-sm">{error}</div>}
       </div>
 
       {data.length > 0 && (
-        <div className="w-full max-w-4xl h-2/6 max-h-2/6 ">
-          <div className="h-full">
-            <table className="w-full border-collapse mb-4">
+        <div className="w-full max-w-4xl h-5/6 max-h-5/6 flex flex-col gap-y-10 items-center ">
+          <div className=" h-2/5 w-full ">
+            <table className="w-full border-collapse ">
               <thead>
                 <tr className="bg-gray-100">
                   <th className=" px-3 py-2">Account Number</th>
@@ -156,9 +175,13 @@ export default function Home() {
                     }`}
                     onClick={() => setSelectedIndex(idx)}
                   >
-                    <td className=" flex justify-center items-center">{row.accountNumber}</td>
-                    <td className=" px-3 py-2 ">{Number(row.usableScore).toLocaleString()}</td>
-                    <td className=" px-3 py-2 ">
+                    <td className=" flex justify-center items-center">
+                      {row.accountNumber}
+                    </td>
+                    <td className=" px-3 py-2 text-center">
+                      {Number(row.usableScore).toLocaleString()}
+                    </td>
+                    <td className=" px-3 py-2 text-center">
                       {Number(row.transferableScore).toLocaleString()}
                     </td>
                     <td className=" py-2 flex justify-center">
@@ -169,12 +192,17 @@ export default function Home() {
                         onChange={(e) =>
                           handleConsumeChange(row.accountNumber, e.target.value)
                         }
-                        onClick={(e) => e.stopPropagation()}
+                        readOnly={!row.usableScore || row.usableScore < 0}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedIndex(idx);
+                        }}
+                        onInput={(e) => handleInput(e, 9)}
                       />
                     </td>
                     <td className=" px-3 py-2">
                       <button
-                        className="bg-green-600 text-white px-3 py-1 rounded disabled:opacity-50"
+                        className="bg-green-600 w-full  text-white px-3 py-1 rounded disabled:opacity-50 flex justify-center items-center"
                         disabled={
                           saving[row.accountNumber] ||
                           !consumeScores[row.accountNumber]
@@ -184,7 +212,11 @@ export default function Home() {
                           handleSaveConsume(row.accountNumber);
                         }}
                       >
-                        {saving[row.accountNumber] ? "Saving..." : "Save"}
+                        {saving[row.accountNumber] ? (
+                          <SpinnerSVG className="h-6 w-5 animate-spin text-white" />
+                        ) : (
+                          "ذخیره"
+                        )}
                       </button>
                       {/* {saveMsg[row.accountNumber] && (
                         <span className="ml-2 text-sm text-gray-600">
@@ -198,8 +230,10 @@ export default function Home() {
             </table>
           </div>
 
-          {selectedIndex !== null && data[selectedIndex] && (
-            <div className="h-[220px] overflow-y-auto">
+          {selectedIndex !== null &&
+          data[selectedIndex] &&
+          data[selectedIndex].usedScore.length ? (
+            <div className="h-[220px] overflow-y-auto w-96">
               <div className="bg-gray-50 p-4 rounded shadow">
                 <div className="font-semibold mb-2">Used Scores</div>
                 {data[selectedIndex].usedScore.length === 0 ? (
@@ -215,8 +249,12 @@ export default function Home() {
                     <tbody>
                       {data[selectedIndex].usedScore.map((u) => (
                         <tr key={u.id}>
-                          <td className="border px-2 py-1">{Number(u.score).toLocaleString()}</td>
-                          <td className="border px-2 py-1">{u.createdAt}</td>
+                          <td className="border px-2 py-1 text-center">
+                            {Number(u.score).toLocaleString()}
+                          </td>
+                          <td className="border px-2 py-1 text-center">
+                            {u.createdAt}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -224,6 +262,10 @@ export default function Home() {
                 )}
               </div>
             </div>
+          ) : (
+            data.length > 0 &&
+            selectedIndex !== null &&
+            !data[selectedIndex].usedScore.length && <div></div>
           )}
         </div>
       )}
