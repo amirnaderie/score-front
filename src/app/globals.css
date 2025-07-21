@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("../../public/font/Vazirmatn-Regular.woff2") format("woff2"),
+    url("../../public/font/Vazirmatn-Regular.woff2") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("../../public/font/Vazirmatn-Bold.woff2") format("woff2"),
+    url("../../public/font/Vazirmatn-Bold.woff2") format("woff");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+    --foreground: #171717;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Vazirmatn, sans-serif;
+}
+
+.persian-numbers {
+  font-family: "Vazirmatn", sans-serif;
+  /* font-family: "Yekan", sans-serif; */
+  font-feature-settings: "ss01"; /* Enable Persian numerals */
+}
+
+* {
+  scrollbar-width: thin !important;
+  /* scrollbar-color: rgb(198, 198, 202) rgb(250, 250, 250); */
+}
+
+.persian-numbers {
+  font-family: "Vazirmatn", sans-serif;
+  /* font-family: "Yekan", sans-serif; */
+  font-feature-settings: "ss01"; /* Enable Persian numerals */
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide spinners in Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.ltr {
+  direction: ltr;
+}
+
+.rtl {
+  direction: rtl;
+}
