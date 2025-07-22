@@ -3,8 +3,8 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
-  title: "مصرف امتیاز",
-  description: "سامانه مصرف امتیاز",
+  title: "مدیریت امتیاز",
+  description: "سامانه مدیریت امتیاز تسهیلات",
 };
 
 export default function RootLayout({

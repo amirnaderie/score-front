@@ -120,8 +120,9 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center  justify-items-center min-h-screen p-8  gap-20 sm:p-20">
-      <div className="flex flex-col gap-4  max-w-md h-1/6">
+    <div className="flex flex-col items-center  justify-items-center min-h-screen p-8  gap-16 sm:p-20">
+      <h1 className="text-2xl font-bold text-amber-700">سامانه مدیریت امتیاز تسهیلات</h1>
+      <div className="flex flex-col gap-y-2  max-w-md h-1/6">
         <label className="font-semibold">کد ملی :</label>
         <div className="flex gap-2">
           <input
@@ -159,11 +160,11 @@ export default function Home() {
             <table className="w-full border-collapse ">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className=" px-3 py-2">Account Number</th>
-                  <th className=" px-3 py-2">Usable Score</th>
-                  <th className=" px-3 py-2">Transferable Score</th>
-                  <th className=" px-3 py-2">Consume Score</th>
-                  <th className=" px-3 py-2">Action</th>
+                  <th className=" px-3 py-2">شماره حساب</th>
+                  <th className=" px-3 py-2">امتیاز قابل استفاده</th>
+                  <th className=" px-3 py-2">امتیاز قابل انتقال</th>
+                  <th className=" px-3 py-2">میزان استفاده</th>
+                  <th className=" px-3 py-2">عملیات</th>
                 </tr>
               </thead>
               <tbody>
@@ -202,7 +203,7 @@ export default function Home() {
                     </td>
                     <td className=" px-3 py-2">
                       <button
-                        className="bg-green-600 w-full  text-white px-3 py-1 rounded disabled:opacity-50 flex justify-center items-center"
+                        className="bg-green-600 w-full  text-white px-3 py-1 rounded disabled:opacity-50 flex justify-center items-center cursor-pointer"
                         disabled={
                           saving[row.accountNumber] ||
                           !consumeScores[row.accountNumber]
@@ -233,17 +234,17 @@ export default function Home() {
           {selectedIndex !== null &&
           data[selectedIndex] &&
           data[selectedIndex].usedScore.length ? (
-            <div className="h-[220px] overflow-y-auto w-96">
+            <div className="h-[270px] overflow-y-auto w-96">
               <div className="bg-gray-50 p-4 rounded shadow">
-                <div className="font-semibold mb-2">Used Scores</div>
+                <div className="font-semibold mb-2 text-sm">امتیازهای استفاده شده</div>
                 {data[selectedIndex].usedScore.length === 0 ? (
                   <div className="text-gray-500">No used scores.</div>
                 ) : (
-                  <table className="w-full border">
+                  <table className="w-full border text-sm">
                     <thead>
                       <tr>
-                        <th className="border px-2 py-1">Score</th>
-                        <th className="border px-2 py-1">Created At</th>
+                        <th className="border px-2 py-1">امتیاز</th>
+                        <th className="border px-2 py-1">تاریخ</th>
                       </tr>
                     </thead>
                     <tbody>
