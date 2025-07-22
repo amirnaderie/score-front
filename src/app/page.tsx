@@ -50,30 +50,34 @@ export default function Home() {
     setError("");
     setData([]);
     setSelectedIndex(null);
-    clearConsumeScores();
-    if (!validateIranianNationalCode(Number(nationalCode))) {
-      setError("کد ملی معتبر نیست");
-      setLoading(false);
-      return;
-    }
-    await fillData(Number(nationalCode));
     try {
+      clearConsumeScores();
+      if (!validateIranianNationalCode(Number(nationalCode))) {
+        setError("کد ملی معتبر نیست");
+        setLoading(false);
+        return;
+      }
+      await fillData(Number(nationalCode));
     } catch (e) {
-      setError("Failed to fetch data");
+      toast.error("خطا در عملیات!");
     } finally {
       setLoading(false);
     }
   };
 
   const fillData = async (nationalCode: number) => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/score/${nationalCode}`
-    );
-    const json: ApiResponse = await res.json();
-    if (json.statusCode !== 200) {
-      setError(json.message || json.error || "Unknown error");
-    } else {
-      setData(json.data);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/score/${nationalCode}`
+      );
+      const json: ApiResponse = await res.json();
+      if (json.statusCode !== 200) {
+        setError(json.message || json.error || "Unknown error");
+      } else {
+        setData(json.data);
+      }
+    } catch (error) {
+      throw error;
     }
   };
   const handleConsumeChange = (accountNumber: string, value: string) => {
@@ -121,7 +125,9 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center  justify-items-center min-h-screen p-8  gap-16 sm:p-20">
-      <h1 className="text-2xl font-bold text-amber-700">سامانه مدیریت امتیاز تسهیلات</h1>
+      <h1 className="text-2xl font-bold text-amber-700">
+        سامانه مدیریت امتیاز تسهیلات
+      </h1>
       <div className="flex flex-col gap-y-2  max-w-md h-1/6">
         <label className="font-semibold">کد ملی :</label>
         <div className="flex gap-2">
@@ -236,7 +242,9 @@ export default function Home() {
           data[selectedIndex].usedScore.length ? (
             <div className="h-[270px] overflow-y-auto w-96">
               <div className="bg-gray-50 p-4 rounded shadow">
-                <div className="font-semibold mb-2 text-sm">امتیازهای استفاده شده</div>
+                <div className="font-semibold mb-2 text-sm">
+                  امتیازهای استفاده شده
+                </div>
                 {data[selectedIndex].usedScore.length === 0 ? (
                   <div className="text-gray-500">No used scores.</div>
                 ) : (

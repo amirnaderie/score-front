@@ -14,6 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa-IR" dir="rtl">
+      <head>
+        <link rel="icon" href="/icon.png" type="image/png" />
+      </head>
       <body className={`persian-numbers antialiased`}>
         <Toaster
           position="top-center" // Or any position you prefer
