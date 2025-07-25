@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import SpinnerSVG from "@/app/assets/svgs/spinnerSvg";
 import { handleInput, validateIranianNationalCode } from "@/app/lib/utility";
+import { fetchWithAuthClient } from "@/app/lib/fetchWithAuthClient";
 
 interface UsedScore {
   id: number;
@@ -20,7 +21,7 @@ interface ScoreRow {
 }
 
 interface ApiResponse {
-  data: ScoreRow[];
+  data: { scoresRec: ScoreRow[]; ownerName: string };
   message: string;
   statusCode: number;
   error?: string;
@@ -28,6 +29,7 @@ interface ApiResponse {
 
 export default function Home() {
   const [nationalCode, setNationalCode] = useState("");
+  const [ownerFullName, setownerFullName] = useState("");
   const [data, setData] = useState<ScoreRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -67,14 +69,26 @@ export default function Home() {
 
   const fillData = async (nationalCode: number) => {
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/score/${nationalCode}`
+      const res = await fetchWithAuthClient(
+        `${process.env.NEXT_PUBLIC_API_URL}/score/${nationalCode}`,
+        {
+          credentials: "include",
+        }
       );
       const json: ApiResponse = await res.json();
       if (json.statusCode !== 200) {
         setError(json.message || json.error || "Unknown error");
       } else {
-        setData(json.data);
+        const { scoresRec: scoresData, ownerName } = json.data;
+        if (
+          scoresData.length > 0 &&
+          (scoresData as any)[0].usedScore &&
+          (scoresData as any)[0].usedScore.length > 0
+        ) {
+          setSelectedIndex(0);
+        }
+        setData(scoresData);
+        setownerFullName(ownerName);
       }
     } catch (error) {
       throw error;
@@ -91,7 +105,7 @@ export default function Home() {
       (scoreItem: ScoreRow) => scoreItem.accountNumber === accountNumber
     )?.scoreId;
     try {
-      const res = await fetch(
+      const res = await fetchWithAuthClient(
         `${process.env.NEXT_PUBLIC_API_URL}/score/consume`,
         {
           method: "POST",
@@ -100,6 +114,7 @@ export default function Home() {
             scoreId,
             score: Number(consumeScores[accountNumber]),
           }),
+          credentials: "include",
         }
       );
       const json = await res.json();
@@ -161,11 +176,12 @@ export default function Home() {
       </div>
 
       {data.length > 0 && (
-        <div className="w-full max-w-4xl h-5/6 max-h-5/6 flex flex-col gap-y-10 items-center ">
-          <div className=" h-2/5 w-full ">
+        <div className="w-full max-w-4xl h-5/6 max-h-5/6 flex flex-col gap-y-10 items-center">
+          <div className="h-2/5 w-full rounded-md overflow-hidden">
+            <div className="h-14 w-full flex justify-center items-center bg-cyan-50 font-bold">نام دارنده حساب: {ownerFullName}</div>
             <table className="w-full border-collapse ">
               <thead>
-                <tr className="bg-gray-100">
+                <tr className="bg-gray-100 text-sm">
                   <th className=" px-3 py-2">شماره حساب</th>
                   <th className=" px-3 py-2">امتیاز قابل استفاده</th>
                   <th className=" px-3 py-2">امتیاز قابل انتقال</th>
@@ -177,7 +193,7 @@ export default function Home() {
                 {data.map((row, idx) => (
                   <tr
                     key={row.accountNumber}
-                    className={` cursor-pointer ${
+                    className={`cursor-pointer ${
                       selectedIndex === idx ? "bg-blue-50" : ""
                     }`}
                     onClick={() => setSelectedIndex(idx)}

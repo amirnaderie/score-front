@@ -35,27 +35,24 @@ const AuthCallback = () => {
         const StateAuthCookie = sessionStorage.getItem("StateAuthCookie");
 
         if (codeParameter && StateAuthCookie === stateParameter) {
-          const response = await fetch("/api/auth", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ codeParameter }),
-          });
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                codeParameter,
+              }),
+              credentials: "include", // Important!
+            }
+          );
+
           setIsLoading(false);
           if (response.ok) {
             sessionStorage.removeItem("StateAuthCookie");
             const res: zarrirUserType = await response.json();
-            console.log(res);
-            // updateUserId(res.id!);
-            // const user: userType | any = await getUserById(res.id!);
-            // setCurrentUser({
-            //   id: user.id,
-            //   userName: user.userName,
-            //   roleId: user.roleId,
-            //   isAdmin: user.isAdmin,
-            // });
-            router.push("/dashboard");
+
+            router.push("/dashboard/score");
           } else {
             toast.error("خطا در احراز هویت");
             if (response.status === 401) {
