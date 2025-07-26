@@ -17,7 +17,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/icon.png" type="image/png" />
       </head>
-      <body className={`persian-numbers antialiased`}>
+      <body className={`persian-numbers antialiased h-dvh w-dvw`}>
         <Toaster
           position="top-center" // Or any position you prefer
           reverseOrder={false} // You can set this based on preference

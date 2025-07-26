@@ -77,7 +77,8 @@ export default function Home() {
       );
       const json: ApiResponse = await res.json();
       if (json.statusCode !== 200) {
-        setError(json.message || json.error || "Unknown error");
+        //setError(json.message || json.error || "Unknown error");
+        toast.error("خطا در عملیات!");
       } else {
         const { scoresRec: scoresData, ownerName } = json.data;
         if (
@@ -139,11 +140,11 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center  justify-items-center min-h-screen p-8  gap-16 sm:p-20">
+    <div className="flex flex-col items-center  justify-items-center h-full p-8  gap-14 sm:p-20">
       <h1 className="text-2xl font-bold text-amber-700">
         سامانه مدیریت امتیاز تسهیلات
       </h1>
-      <div className="flex flex-col gap-y-2  max-w-md h-1/6">
+      <div className="flex flex-col gap-y-2  max-w-md ">
         <label className="font-semibold">کد ملی :</label>
         <div className="flex gap-2">
           <input
@@ -176,38 +177,47 @@ export default function Home() {
       </div>
 
       {data.length > 0 && (
-        <div className="w-full max-w-4xl h-5/6 max-h-5/6 flex flex-col gap-y-10 items-center">
-          <div className="h-2/5 w-full rounded-md overflow-hidden">
-            <div className="h-14 w-full flex justify-center items-center bg-cyan-50 font-bold">نام دارنده حساب: {ownerFullName}</div>
-            <table className="w-full border-collapse ">
-              <thead>
-                <tr className="bg-gray-100 text-sm">
-                  <th className=" px-3 py-2">شماره حساب</th>
-                  <th className=" px-3 py-2">امتیاز قابل استفاده</th>
-                  <th className=" px-3 py-2">امتیاز قابل انتقال</th>
-                  <th className=" px-3 py-2">میزان استفاده</th>
-                  <th className=" px-3 py-2">عملیات</th>
-                </tr>
-              </thead>
-              <tbody>
+        <div className="w-full max-w-4xl  flex flex-col gap-y-10 items-center">
+          <div className=" w-full rounded-md overflow-hidden">
+            <div className="h-14 w-full flex justify-center items-center bg-cyan-50 font-bold">
+              نام و نام خانوادگی: {ownerFullName}
+            </div>
+            <div className="w-full border-collapse ">
+              <div className="bg-gray-100 text-sm w-full flex justify-start">
+                <span className=" px-3 py-2 w-[25%] text-center">
+                  شماره حساب
+                </span>
+                <span className=" px-3 py-2 w-[20%] text-center">
+                  امتیاز قابل استفاده
+                </span>
+                <span className=" px-3 py-2 w-[20%] text-center">
+                  امتیاز قابل انتقال
+                </span>
+                <span className=" px-3 py-2 w-[25%] text-center">
+                  میزان استفاده
+                </span>
+                <span className=" px-3 py-2 w-[10%] text-center">عملیات</span>
+              </div>
+
+              <div className="w-full max-h-[150px] overflow-auto pb-5">
                 {data.map((row, idx) => (
-                  <tr
+                  <div
                     key={row.accountNumber}
-                    className={`cursor-pointer ${
+                    className={`cursor-pointer w-full flex justify-start ${
                       selectedIndex === idx ? "bg-blue-50" : ""
                     }`}
                     onClick={() => setSelectedIndex(idx)}
                   >
-                    <td className=" flex justify-center items-center">
+                    <span className=" px-3 py-2 w-[25%] text-center">
                       {row.accountNumber}
-                    </td>
-                    <td className=" px-3 py-2 text-center">
+                    </span>
+                    <span className=" px-3 py-2  w-[20%] text-center">
                       {Number(row.usableScore).toLocaleString()}
-                    </td>
-                    <td className=" px-3 py-2 text-center">
+                    </span>
+                    <span className=" px-3 py-2  w-[20%] text-center">
                       {Number(row.transferableScore).toLocaleString()}
-                    </td>
-                    <td className=" py-2 flex justify-center">
+                    </span>
+                    <span className=" py-2 flex justify-center w-[25%]">
                       <input
                         type="number"
                         className="border rounded px-2 py-1 w-[70%] ltr "
@@ -222,8 +232,8 @@ export default function Home() {
                         }}
                         onInput={(e) => handleInput(e, 9)}
                       />
-                    </td>
-                    <td className=" px-3 py-2">
+                    </span>
+                    <span className=" px-3 py-2 w-[10%]">
                       <button
                         className="bg-green-600 w-full  text-white px-3 py-1 rounded disabled:opacity-50 flex justify-center items-center cursor-pointer"
                         disabled={
@@ -246,11 +256,11 @@ export default function Home() {
                           {saveMsg[row.accountNumber]}
                         </span>
                       )} */}
-                    </td>
-                  </tr>
+                    </span>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
           </div>
 
           {selectedIndex !== null &&
@@ -264,26 +274,24 @@ export default function Home() {
                 {data[selectedIndex].usedScore.length === 0 ? (
                   <div className="text-gray-500">No used scores.</div>
                 ) : (
-                  <table className="w-full border text-sm">
-                    <thead>
-                      <tr>
-                        <th className="border px-2 py-1">امتیاز</th>
-                        <th className="border px-2 py-1">تاریخ</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                  <div className="w-full  text-sm">
+                    <div className="w-full flex justify-start">
+                      <span className="border px-2 py-1 w-[50%] text-center">امتیاز</span>
+                      <span className="border px-2 py-1 w-[50%] text-center">تاریخ</span>
+                    </div>
+                    <div className="w-full">
                       {data[selectedIndex].usedScore.map((u) => (
-                        <tr key={u.id}>
-                          <td className="border px-2 py-1 text-center">
+                        <div key={u.id} className="w-full flex justify-start ">
+                          <span className="border px-2 py-1 text-center w-[50%]">
                             {Number(u.score).toLocaleString()}
-                          </td>
-                          <td className="border px-2 py-1 text-center">
+                          </span>
+                          <span className="border px-2 py-1 text-center w-[50%]">
                             {u.createdAt}
-                          </td>
-                        </tr>
+                          </span>
+                        </div>
                       ))}
-                    </tbody>
-                  </table>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

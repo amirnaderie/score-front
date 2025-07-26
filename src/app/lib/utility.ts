@@ -7,6 +7,16 @@ export const handleInput = (e: any, maxLength: number) => {
     e.target.value = inputValue.slice(0, maxLength);
 };
 
+export const generateToken = (length: number): string => {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
 export const validateIranianNationalCode = (nationalCode: number) => {
   // Check if input is provided
   if (!nationalCode) {
